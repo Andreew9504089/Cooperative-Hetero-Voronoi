@@ -420,7 +420,7 @@ class PTZCamera():
                 A_neighbor = [[2 * x_diff, 0], [0, 2 * y_diff]]
                 A_list.append(A_neighbor)
 
-                l_neighbor = -1 * (x_diff**2 + y_diff**2 - 0.5**2)  # Safety constraint for each neighbor
+                l_neighbor = -1 * (x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
                 l_list.append([l_neighbor, l_neighbor])  # Assuming the same lower bound applies to both dimensions
 
             # Convert list of matrices and vectors to block diagonal form and concatenate respectively
@@ -432,8 +432,9 @@ class PTZCamera():
 
             # Create and setup the OSQP problem instance
             prob = osqp.OSQP()
+            
             prob.setup(P, q, A, l, u, verbose=False)
-
+            prob.warm_start(x=u_p)
             # Solve the QP problem
             res = prob.solve()
             if res.info.status == 'solved':
