@@ -1,0 +1,13 @@
+<launch>
+    <rosparam param="/total_agents"> 6 </rosparam>
+    <rosparam param="/grid_size"> 0.1 </rosparam>
+    <rosparam param="/map_width"> 24 </rosparam>
+    <rosparam param="/map_height"> 24 </rosparam>
+    <rosparam param="/test"> 0 </rosparam> <!-- 0: False 1: True-->
+
+    <node name="Visualizer" pkg="voronoi_cbsa" type="plot.py" output="screen" />
+    <node name="GroundControlStation" pkg="voronoi_cbsa" type="Ground.py" output="screen" />
+
+
+</launch>
+
