@@ -56,9 +56,8 @@ if __name__ == "__main__":
     
     #targets = [[random_pos((16,16)), 2, 10,np.array([1.,1.]), ['camera', 'manipulator']]]
     
-    targets = [[random_pos((12,8)), 0.8, 10,np.array([1.,1.]), ['camera', 'manipulator']],
-               [random_pos((10,14)), 0.8, 10,np.array([1.,1.]), ['camera', 'manipulator']],
-               [random_pos((14,14)), 0.8, 10,np.array([1.,1.]), ['camera', 'manipulator']]]
+    targets = [[random_pos((5,20)), 0.8, 10,np.array([1.,1.]), ['camera', 'manipulator']],
+               [random_pos((10,14)), 0.8, 10,np.array([1.,1.]), ['camera', 'smoke_detector']]]
     
     # targets = [[random_pos((12,12)), 1.2, 10,np.array([1.,1.]), ['camera', 'manipulator', 'smoke_detector']],
     #            [random_pos((8,16)), 1.2, 10,np.array([1.,1.]), ['camera', 'smoke_detector']],
@@ -106,3 +105,4 @@ if __name__ == "__main__":
 
         target_pub.publish(targets_array)
         rate.sleep()
+        
