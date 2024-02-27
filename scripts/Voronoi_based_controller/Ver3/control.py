@@ -395,72 +395,59 @@ class PTZCamera():
         u_avoid = np.array([0., 0.])
         next_pos = self.pos  
         next_pos += self.K_p * u_p * self.step if not np.isnan(u_p)[0] else self.pos
-        
+        vel             = np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_p) * self.step
+        yaw_rate        = np.arctan(np.inner(np.array([-math.sin(self.yaw), math.cos(self.yaw)]),u_p)
+                                    /np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_p))*self.step
         # Constants
         num_neighbors = len(self.neighbors_buffer)  # Assuming this is the number of neighbors
         num_variables = 2  # Number of variables (e.g., x and y coordinates)
 
-        if num_neighbors > 0:
+        if num_neighbors > 0 and not (next_pos[0] < 0 or next_pos[1] < 0):
             # Quadratic cost matrix (unchanged)
-            P = sparse.csc_matrix(np.eye(num_variables))
+            p = np.eye(num_variables)
 
             # Linear cost vector (unchanged)
-            q = np.array([-u_p[0], -u_p[1]])
+            q = np.array([-0.5*vel, -0.5*yaw_rate])
 
             # Initialize lists for constraint matrices and vectors
-            A_list = []
-            l_list = []
-
+            g = np.zeros((num_neighbors,num_variables))
+            h = np.zeros(num_neighbors)
+            
             # Calculate the components needed for A and l for each neighbor
-            for neighbor in self.neighbors_buffer:
+            for i,neighbor in enumerate(self.neighbors_buffer):
                 x_diff = self.pos[0] - self.neighbors_buffer[neighbor]['position'][0]
                 y_diff = self.pos[1] - self.neighbors_buffer[neighbor]['position'][1]
 
                 # Add the constraints for this neighbor
-                A_neighbor = [[2 * x_diff, 0], [0, 2 * y_diff]]
-                A_list.append(A_neighbor)
+                g[i,0] = 2*(x_diff+0.1*math.cos(self.yaw))*math.cos(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*math.sin(self.yaw)
+                g[i,1] = -2*(x_diff+0.1*math.cos(self.yaw))*0.1*math.sin(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*0.1*math.cos(self.yaw)
 
-                l_neighbor = -1 * (x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
-                l_list.append([l_neighbor, l_neighbor])  # Assuming the same lower bound applies to both dimensions
+                h[i] = 3*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
 
-            # Convert list of matrices and vectors to block diagonal form and concatenate respectively
-            A = sparse.block_diag(A_list, format='csc')
-            l = np.concatenate(l_list)
-
-            # Upper bounds, very high to not enforce upper constraint (unchanged but extended)
-            u = np.array([999] * 2 * num_neighbors)
+            P = matrix(p)
+            Q = matrix(q,tc='d')
+            G = matrix(g,tc='d')
+            H = matrix(h.T,tc='d')
 
             # Create and setup the OSQP problem instance
-            prob = osqp.OSQP()
+            solvers.options['show_progress'] = False
             
-            prob.setup(P, q, A, l, u, verbose=False)
-            prob.warm_start(x=u_p)
-            # Solve the QP problem
-            res = prob.solve()
-            if res.info.status == 'solved':
-                # Extract the optimal control action
-                u_opt = res.x
-                vel             = np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_opt) * self.step
-                yaw_rate        = np.arctan(np.inner(np.array([-math.sin(self.yaw), math.cos(self.yaw)]),u_opt)
-                                            /np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_opt))*self.step
-
-                #print(u_optimal[0], ";", vel)
+            try:
+                sol=solvers.coneqp(P, Q, G, H, verbose=False)
+                u_opt = sol['x']
+                #print(sol)
                 cmd = Twist()
-                cmd.linear.x = vel
-                cmd.angular.z = yaw_rate
+                cmd.linear.x = u_opt[0]
+                cmd.angular.z = u_opt[1]
                 self.pub_cmd_vel.publish(cmd)
-
-            else:
-                vel             = np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_p) * self.step
-                yaw_rate        = np.arctan(np.inner(np.array([-math.sin(self.yaw), math.cos(self.yaw)]),u_p)
-                                            /np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_p))*self.step
-
-                #print(u_optimal[0], ";", vel)
-                cmd = Twist()
-                cmd.linear.x = vel
-                cmd.angular.z = yaw_rate
-                self.pub_cmd_vel.publish(cmd)
-                print("QP problem not solved. Status:", res.info.status)
+            except:
+                print("Solver Failed")
+            
+        else:
+            cmd = Twist()
+            cmd.linear.x = 0
+            cmd.angular.z = 0
+            self.pub_cmd_vel.publish(cmd)
                 
     def UpdatePerspective(self, u_v):
         
