@@ -407,7 +407,7 @@ class PTZCamera():
             p = np.eye(num_variables)
 
             # Linear cost vector (unchanged)
-            q = np.array([-0.5*vel, -0.5*yaw_rate])
+            q = np.array([-2*vel, -2*yaw_rate])
 
             # Initialize lists for constraint matrices and vectors
             g = np.zeros((num_neighbors,num_variables))
@@ -422,9 +422,9 @@ class PTZCamera():
                 g[i,0] = 2*(x_diff+0.1*math.cos(self.yaw))*math.cos(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*math.sin(self.yaw)
                 g[i,1] = -2*(x_diff+0.1*math.cos(self.yaw))*0.1*math.sin(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*0.1*math.cos(self.yaw)
 
-                h[i] = 3*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
+                h[i] = (x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
 
-            P = matrix(p)
+            P = matrix(2*p)
             Q = matrix(q,tc='d')
             G = matrix(g,tc='d')
             H = matrix(h.T,tc='d')
