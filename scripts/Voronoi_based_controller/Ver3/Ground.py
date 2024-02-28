@@ -2,6 +2,7 @@
 
 import rospy
 from voronoi_cbsa.msg import TargetInfoArray, TargetInfo
+from std_msgs.msg   import Int8
 
 import pygame
 import numpy as np
@@ -42,6 +43,7 @@ if __name__ == "__main__":
     rate = rospy.Rate(60)
 
     target_pub = rospy.Publisher("/target", TargetInfoArray, queue_size=10)
+    start_pub   = rospy.Publisher("/start", Int8, queue_size=1)
     
     def random_pos(pos=(0,0)):
         if pos == (0,0):
@@ -78,6 +80,16 @@ if __name__ == "__main__":
     seeds = [range(10000*a - 9999, 10000*a), range(20001*a - 10000, 20000*a),
              range(30001*a - 10000, 30000*a),range(40001*a - 10000, 40000*a)]
     
+    rospy.logwarn("Press 's' then enter to start experiment")
+    a = input('').split(" ")[0]
+    if a == 's':
+        rospy.logwarn("Experiment Start")
+        msg = Int8()
+        msg.data = 1
+        start_pub.publish(msg)
+    else:
+        print("Unknown command")
+        
     while not rospy.is_shutdown():
             
         grid_size = rospy.get_param("/grid_size", 0.1)
