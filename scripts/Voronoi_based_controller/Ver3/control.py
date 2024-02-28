@@ -2,7 +2,7 @@
 import rospy
 from geometry_msgs.msg import Pose, Point, Twist
 from voronoi_cbsa.msg import ExchangeData, ExchangeDataArray, TargetInfoArray, SensorArray, Sensor, ValidSensors, WeightArray, Weight
-from std_msgs.msg import Int16, Float32MultiArray, Int16MultiArray, Float32, Float64, Float64MultiArray, String
+from std_msgs.msg import Int16, Float32MultiArray, Int16MultiArray, Float32, Float64, Float64MultiArray, String, Int8
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
@@ -29,6 +29,8 @@ class PTZCamera():
                  coop, balance, strength, camera_properties=None, 
                  manipulator_properties=None, smoke_detector_properties=None, K_p=0.8, K_v=0.8, step = 0.1):
 
+        self.start = False
+        
         self.K_p            = K_p
         self.K_v            = K_v
         self.step           = step
@@ -110,7 +112,8 @@ class PTZCamera():
 
         rospy.Subscriber("local/neighbor_info", ExchangeDataArray, self.NeighborCallback)
         rospy.Subscriber("local/target", TargetInfoArray, self.TargetCallback)
-        rospy.Subscriber("ground_truth/state", Odometry, self.PosCallback)     
+        rospy.Subscriber("ground_truth/state", Odometry, self.PosCallback)  
+        rospy.Subscriber("/start", Int8, self.startcb)   
         
         self.pub_pos                = rospy.Publisher("local/position", Point, queue_size=10)
         self.pub_exchange_data      = rospy.Publisher("local/exchange_data",ExchangeData, queue_size=10)
@@ -128,7 +131,11 @@ class PTZCamera():
         for sensor in self.valid_sensors.keys():
             if self.valid_sensors[sensor]:
                 self.pub_sensor_graphs[sensor] = rospy.Publisher("visualize/"+sensor+"_neighbor", Int16MultiArray, queue_size = 10)
-        
+    
+    def startcb(self, msg):
+        if msg.data == 1:
+            self.start = True
+            
     def NeighborCallback(self, msg):
         self.neighbors_buffer = {}
         
@@ -963,8 +970,8 @@ if __name__ == "__main__":
     per_y = []
     cnt = 0
     
-    while not rospy.is_shutdown() and not kill and not failure and cnt <= 400:
-        if tick:
+    while not rospy.is_shutdown() and not kill and not failure:
+        if tick and UAV_self.start:
             UAV_self.Update()
         
             frame.append(cnt)
