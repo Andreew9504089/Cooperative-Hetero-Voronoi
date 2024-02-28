@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-from geometry_msgs.msg import Pose, Point, Twist
+from geometry_msgs.msg import Pose, Point, Twist, PoseStamped
 from voronoi_cbsa.msg import ExchangeData, ExchangeDataArray, TargetInfoArray, SensorArray, Sensor, ValidSensors, WeightArray, Weight
 from std_msgs.msg import Int16, Float32MultiArray, Int16MultiArray, Float32, Float64, Float64MultiArray, String, Int8
 from nav_msgs.msg import Odometry
@@ -112,7 +112,7 @@ class PTZCamera():
 
         rospy.Subscriber("local/neighbor_info", ExchangeDataArray, self.NeighborCallback)
         rospy.Subscriber("local/target", TargetInfoArray, self.TargetCallback)
-        rospy.Subscriber("ground_truth/state", Odometry, self.PosCallback)  
+        rospy.Subscriber("/vrpn_client_node/agent_"+str(self.id)+"/pose", PoseStamped, self.PosCallback)  
         rospy.Subscriber("/start", Int8, self.startcb)   
         
         self.pub_pos                = rospy.Publisher("local/position", Point, queue_size=10)
@@ -188,12 +188,12 @@ class PTZCamera():
             self.target_buffer[target.id] = [pos, std, weight, vel, target.id, requirements]
                 
     def PosCallback(self, msg):
-        self.tmp_pos[0] = msg.pose.pose.position.x
-        self.tmp_pos[1] = msg.pose.pose.position.y
-        qx = msg.pose.pose.orientation.x
-        qy = msg.pose.pose.orientation.y
-        qz = msg.pose.pose.orientation.z
-        qw = msg.pose.pose.orientation.w
+        self.tmp_pos[0] = msg.pose.position.x
+        self.tmp_pos[1] = msg.pose.position.y
+        qx = msg.pose.orientation.x
+        qy = msg.pose.orientation.y
+        qz = msg.pose.orientation.z
+        qw = msg.pose.orientation.w
         r = R.from_quat([qx, qy, qz, qw])
         self.tmp_yaw = r.as_euler('zyx')[0]
              
