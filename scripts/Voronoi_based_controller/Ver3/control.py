@@ -452,7 +452,7 @@ class PTZCamera():
             except:
                 print("Solver Failed")
             
-        elif not not (next_pos[0] < -0.5*self.map_size[0] or next_pos[1] < -0.5*self.map_size[0]):
+        elif not (next_pos[0] < -0.5*self.map_size[0] or next_pos[1] < -0.5*self.map_size[0]):
             cmd = Twist()
             cmd.linear.x = vel
             cmd.angular.z = yaw_rate
