@@ -188,8 +188,8 @@ class PTZCamera():
             self.target_buffer[target.id] = [pos, std, weight, vel, target.id, requirements]
                 
     def PosCallback(self, msg):
-        self.tmp_pos[0] = msg.pose.position.x
-        self.tmp_pos[1] = msg.pose.position.y
+        self.tmp_pos[0] = msg.pose.position.x - self.map_size[0]/2
+        self.tmp_pos[1] = msg.pose.position.y - self.map_size[1]/2
         qx = msg.pose.orientation.x
         qy = msg.pose.orientation.y
         qz = msg.pose.orientation.z
@@ -409,7 +409,7 @@ class PTZCamera():
         num_neighbors = len(self.neighbors_buffer)  # Assuming this is the number of neighbors
         num_variables = 2  # Number of variables (e.g., x and y coordinates)
 
-        if num_neighbors > 0 and not (next_pos[0] < 0 or next_pos[1] < 0):
+        if num_neighbors > 0 and not (next_pos[0] < -0.5*self.map_size[0] or next_pos[1] < -0.5*self.map_size[0]):
             # Quadratic cost matrix (unchanged)
             p = np.eye(num_variables)
 
