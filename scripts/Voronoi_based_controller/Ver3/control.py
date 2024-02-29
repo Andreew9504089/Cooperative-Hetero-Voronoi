@@ -29,7 +29,7 @@ tick = False
 class PTZCamera():
     def __init__(self, map_size, grid_size, general_properties,
                  coop, balance, strength, camera_properties=None, 
-                 manipulator_properties=None, smoke_detector_properties=None, K_p=1, K_v=1, step = 0.1):
+                 manipulator_properties=None, smoke_detector_properties=None, K_p=1, K_v=0.5, step = 0.1):
 
         self.start = False
         
