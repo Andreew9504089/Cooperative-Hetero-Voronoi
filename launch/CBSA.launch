@@ -1,7 +1,7 @@
 <launch>
     <rosparam param="/total_agents"> 5 </rosparam>
     <rosparam param="/grid_size"> 0.01 </rosparam>
-    <rosparam param="/map_width"> 4.85 </rosparam>
+    <rosparam param="/map_width"> 4.84 </rosparam>
     <rosparam param="/map_height"> 3 </rosparam>
     <rosparam param="/test"> 0 </rosparam> <!-- 0: False 1: True-->
 
