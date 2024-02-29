@@ -402,11 +402,11 @@ class PTZCamera():
         u_p = self.max_speed*(u_p/np.linalg.norm(u_p))
         
         u_avoid = np.array([0., 0.])
-        next_pos = self.pos  
-        next_pos += self.K_p * u_p * self.step if not np.isnan(u_p)[0] else self.pos
-        vel             = np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_p) * self.step
-        yaw_rate        = np.arctan(np.inner(np.array([-math.sin(self.yaw), math.cos(self.yaw)]),u_p)
-                                    /np.inner(np.array([math.cos(self.yaw), math.sin(self.yaw)]),u_p))*self.step
+        next_pos = self.tmp_pos  
+        next_pos += self.K_p * u_p * self.step if not np.isnan(u_p)[0] else self.tmp_pos
+        vel             = np.inner(np.array([math.cos(self.tmp_yaw), math.sin(self.tmp_yaw)]),u_p) * self.step
+        yaw_rate        = np.arctan(np.inner(np.array([-math.sin(self.tmp_yaw), math.cos(self.tmp_yaw)]),u_p)
+                                    /np.inner(np.array([math.cos(self.tmp_yaw), math.sin(self.tmp_yaw)]),u_p))*self.step
         # Constants
         num_neighbors = len(self.neighbors_buffer)  # Assuming this is the number of neighbors
         num_variables = 2  # Number of variables (e.g., x and y coordinates)
@@ -424,14 +424,14 @@ class PTZCamera():
             
             # Calculate the components needed for A and l for each neighbor
             for i,neighbor in enumerate(self.neighbors_buffer):
-                x_diff = self.pos[0] - self.neighbors_buffer[neighbor]['position'][0]
-                y_diff = self.pos[1] - self.neighbors_buffer[neighbor]['position'][1]
+                x_diff = self.tmp_pos[0] - self.neighbors_buffer[neighbor]['position'][0]
+                y_diff = self.tmp_pos[1] - self.neighbors_buffer[neighbor]['position'][1]
 
                 # Add the constraints for this neighbor
-                g[i,0] = 2*(x_diff+0.1*math.cos(self.yaw))*math.cos(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*math.sin(self.yaw)
-                g[i,1] = -2*(x_diff+0.1*math.cos(self.yaw))*0.1*math.sin(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*0.1*math.cos(self.yaw)
+                g[i,0] = -2*(x_diff+0.1*math.cos(self.tmp_yaw))*math.cos(self.tmp_yaw)-2*(y_diff+0.1*math.sin(self.tmp_yaw))*math.sin(self.tmp_yaw)
+                g[i,1] = 2*(x_diff+0.1*math.cos(self.tmp_yaw))*0.1*math.sin(self.tmp_yaw)-2*(y_diff+0.1*math.sin(self.tmp_yaw))*0.1*math.cos(self.tmp_yaw)
 
-                h[i] = 2*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
+                h[i] = 3*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
 
             P = matrix(2*p)
             Q = matrix(q,tc='d')
