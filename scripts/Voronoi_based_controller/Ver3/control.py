@@ -431,7 +431,7 @@ class PTZCamera():
                 g[i,0] = -2*(x_diff+0.1*math.cos(self.tmp_yaw))*math.cos(self.tmp_yaw)-2*(y_diff+0.1*math.sin(self.tmp_yaw))*math.sin(self.tmp_yaw)
                 g[i,1] = 2*(x_diff+0.1*math.cos(self.tmp_yaw))*0.1*math.sin(self.tmp_yaw)-2*(y_diff+0.1*math.sin(self.tmp_yaw))*0.1*math.cos(self.tmp_yaw)
 
-                h[i] = 3*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
+                h[i] = 1.5*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
 
             P = matrix(2*p)
             Q = matrix(q,tc='d')
