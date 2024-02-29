@@ -431,7 +431,7 @@ class PTZCamera():
                 g[i,0] = 2*(x_diff+0.1*math.cos(self.yaw))*math.cos(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*math.sin(self.yaw)
                 g[i,1] = -2*(x_diff+0.1*math.cos(self.yaw))*0.1*math.sin(self.yaw)+2*(y_diff+0.1*math.sin(self.yaw))*0.1*math.cos(self.yaw)
 
-                h[i] = (x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
+                h[i] = 2*(x_diff**2 + y_diff**2 - 0.3**2)  # Safety constraint for each neighbor
 
             P = matrix(2*p)
             Q = matrix(q,tc='d')
@@ -452,10 +452,15 @@ class PTZCamera():
             except:
                 print("Solver Failed")
             
-        else:
+        elif not not (next_pos[0] < -0.5*self.map_size[0] or next_pos[1] < -0.5*self.map_size[0]):
             cmd = Twist()
             cmd.linear.x = vel
             cmd.angular.z = yaw_rate
+            self.pub_cmd_vel.publish(cmd)
+        else:
+            cmd = Twist()
+            cmd.linear.x = 0
+            cmd.angular.z = 0
             self.pub_cmd_vel.publish(cmd)
                 
     def UpdatePerspective(self, u_v):
