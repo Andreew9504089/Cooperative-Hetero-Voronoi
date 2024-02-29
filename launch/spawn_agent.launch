@@ -54,15 +54,6 @@
             <param name="approx_param"      type="double"   value="$(arg approx_param)"     />
             <param name="smoke_variance"    type="double"   value="$(arg smoke_variance)"   />
         </node>
-	
-	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
-		<param name="publish_frequency" type="double" value="50.0" />
-		<param name="tf_prefix" value="agent_$(arg id)" />
-	</node>
-	
-	<param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_burger.urdf.xacro" />
-	
-	<node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model agent_$(arg id) -x $(arg position_x) -y $(arg position_y) -z 0 -Y 0 -param robot_description" />
 </group>
 
 </launch>
