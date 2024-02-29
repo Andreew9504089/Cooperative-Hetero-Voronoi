@@ -411,7 +411,7 @@ class PTZCamera():
         num_neighbors = len(self.neighbors_buffer)  # Assuming this is the number of neighbors
         num_variables = 2  # Number of variables (e.g., x and y coordinates)
 
-        if num_neighbors > 0 and not (next_pos[0] < -0.5*self.map_size[0] or next_pos[1] < -0.5*self.map_size[0]):
+        if num_neighbors > 0 and not (next_pos[0] < 0 or next_pos[1] < 0):
             # Quadratic cost matrix (unchanged)
             p = np.eye(num_variables)
 
