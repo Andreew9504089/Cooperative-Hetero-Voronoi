@@ -452,8 +452,8 @@ class PTZCamera():
             
         else:
             cmd = Twist()
-            cmd.linear.x = 0
-            cmd.angular.z = 0
+            cmd.linear.x = vel
+            cmd.angular.z = yaw_rate
             self.pub_cmd_vel.publish(cmd)
                 
     def UpdatePerspective(self, u_v):
