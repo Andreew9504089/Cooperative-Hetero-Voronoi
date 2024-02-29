@@ -1,8 +1,8 @@
 <launch>
-    <rosparam param="/total_agents"> 6 </rosparam>
-    <rosparam param="/grid_size"> 0.1 </rosparam>
-    <rosparam param="/map_width"> 24 </rosparam>
-    <rosparam param="/map_height"> 24 </rosparam>
+    <rosparam param="/total_agents"> 5 </rosparam>
+    <rosparam param="/grid_size"> 0.01 </rosparam>
+    <rosparam param="/map_width"> 4.85 </rosparam>
+    <rosparam param="/map_height"> 3 </rosparam>
     <rosparam param="/test"> 0 </rosparam> <!-- 0: False 1: True-->
     
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
