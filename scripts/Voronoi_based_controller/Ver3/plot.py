@@ -156,8 +156,8 @@ class Visualize2D():
         self.targets = []
 
         for target in msg.targets:
-            pos_x = target.position.x
-            pos_y = target.position.y
+            pos_x = target.position.x+self.map_size[0]/2
+            pos_y = target.position.y+self.map_size[1]/2
             pos = np.array([pos_x, pos_y])
 
             std = target.standard_deviation
@@ -200,7 +200,7 @@ class Visualize2D():
     def PoseCB(self, id):
         def callback(msg):
 
-            self.agent_pos[id] = np.asarray([msg.position.x, msg.position.y])
+            self.agent_pos[id] = np.asarray([msg.position.x+self.map_size[0]/2, msg.position.y+self.map_size[1]/2])
             self.agent_per[id] = np.asarray([msg.orientation.x, msg.orientation.y])
 
         return callback
