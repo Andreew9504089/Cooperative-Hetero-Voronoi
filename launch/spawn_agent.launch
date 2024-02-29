@@ -54,6 +54,12 @@
             <param name="approx_param"      type="double"   value="$(arg approx_param)"     />
             <param name="smoke_variance"    type="double"   value="$(arg smoke_variance)"   />
         </node>
+
+	<include file="$(find turtlebot3_bringup)/launch/turtlebot3_core.launch">
+		<arg name="multi_robot_name" value="agent_$(arg id)"/>
+	</include>
+	<node pkg="turtlebot3_bringup" type="turtlebot3_diagnostics" name="turtlebot3_diagnostics" output="screen"/>
+
 </group>
 
 </launch>
