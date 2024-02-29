@@ -20,6 +20,8 @@ import math
 import _thread
 import osqp
 from scipy import sparse
+from cvxopt import matrix, solvers
+
 
 clk = 1
 tick = False
