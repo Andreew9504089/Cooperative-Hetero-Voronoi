@@ -982,6 +982,8 @@ if __name__ == "__main__":
             per_y.append(UAV_self.perspective[1])
             cnt += 1
             tick = False
+        elif(not UAV_self.start):
+            print("Press Start on Ground Station")
             
     plt_dict = {'frame_id'              : frame,
                 str(id)+"'s score"      : score,
