@@ -188,8 +188,8 @@ class PTZCamera():
             self.target_buffer[target.id] = [pos, std, weight, vel, target.id, requirements]
                 
     def PosCallback(self, msg):
-        self.tmp_pos[0] = msg.pose.position.x - self.map_size[0]/2
-        self.tmp_pos[1] = msg.pose.position.y - self.map_size[1]/2
+        self.tmp_pos[0] = msg.pose.position.x + 2.7
+        self.tmp_pos[1] = msg.pose.position.y + 1.87
         qx = msg.pose.orientation.x
         qy = msg.pose.orientation.y
         qz = msg.pose.orientation.z
