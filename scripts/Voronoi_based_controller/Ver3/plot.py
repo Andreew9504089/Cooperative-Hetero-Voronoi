@@ -156,8 +156,8 @@ class Visualize2D():
         self.targets = []
 
         for target in msg.targets:
-            pos_x = target.position.x+self.map_size[0]/2
-            pos_y = target.position.y+self.map_size[1]/2
+            pos_x = target.position.x
+            pos_y = target.position.y
             pos = np.array([pos_x, pos_y])
 
             std = target.standard_deviation
